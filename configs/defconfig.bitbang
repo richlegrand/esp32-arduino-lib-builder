@@ -1,0 +1,36 @@
+# BitBang overrides, applied last so they win over defconfig.common and the
+# per-target and per-feature fragments.
+#
+# Everything here is required for the WebRTC stack to link and run. Measured on
+# an ESP32-S3-EYE; see arduino-support.md, milestone M0.
+
+# DTLS-SRTP. Without it Dtls_mbedtls.c does not link at all --
+# mbedtls_ssl_conf_dtls_srtp_* are undefined. This single symbol is why a
+# custom core is needed rather than a library against the stock one.
+CONFIG_MBEDTLS_SSL_DTLS_SRTP=y
+
+# The stack makes many small allocations. At 4096 they are all forced into
+# internal RAM, it fills, and lwIP cannot get the buffers it must have
+# internally -- packets drop, SCTP times out, and cwnd collapses to a single
+# segment: 43 KB/s instead of 254. Bisected over five builds; this is the only
+# one of arduino-esp32's memory settings that matters.
+#
+# It is an allocation preference for plain malloc only. Anything needing
+# internal or DMA memory asks with heap_caps_malloc and is unaffected.
+CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=0
+
+# The S3 has no hardware GCM, so mbedTLS drives the AES accelerator one 16-byte
+# block at a time. Coordinating each of those through an interrupt costs more
+# than the block is worth. Worth about 15%.
+CONFIG_MBEDTLS_HARDWARE_AES=y
+# CONFIG_MBEDTLS_AES_USE_INTERRUPT is not set
+
+# DTLS record sizes are asymmetric here, and mbedTLS buffers come from PSRAM
+# rather than the internal heap, which is the scarce pool on this chip.
+CONFIG_MBEDTLS_ASYMMETRIC_CONTENT_LEN=y
+CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC=y
+
+# Note on what is deliberately absent: MBEDTLS_DYNAMIC_BUFFER. defconfig.common
+# sets it, but it is `depends on !MBEDTLS_SSL_PROTO_DTLS` and DTLS is on, so
+# Kconfig drops it and the three FREE_* settings that depend on it. They have
+# never taken effect in this build or in ours.

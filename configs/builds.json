@@ -61,6 +61,7 @@
 		},
 		{
 			"target": "esp32c5",
+			"skip": 1,
 			"features":["qio_ram"],
 			"idf_libs":["qio","80m"],
 			"bootloaders":[
@@ -76,6 +77,7 @@
 		{
 			"chip_variant": "esp32p4_es",
 			"target": "esp32p4",
+			"skip": 1,
 			"features":["qio_ram","esp_sr"],
 			"idf_libs":["qio","80m_200m"],
 			"bootloaders":[
@@ -90,6 +92,7 @@
 		},
 		{
 			"target": "esp32p4",
+			"skip": 1,
 			"features":["qio_ram","esp_sr"],
 			"idf_libs":["qio","80m_200m"],
 			"bootloaders":[
@@ -119,6 +122,7 @@
 		},
 		{
 			"target": "esp32h2",
+			"skip": 1,
 			"features":[],
 			"idf_libs":["qio","64m"],
 			"bootloaders":[
@@ -133,6 +137,7 @@
 		},
 		{
 			"target": "esp32c6",
+			"skip": 1,
 			"features":[],
 			"idf_libs":["qio","80m"],
 			"bootloaders":[
@@ -147,6 +152,7 @@
 		},
 		{
 			"target": "esp32c3",
+			"skip": 1,
 			"features":[],
 			"idf_libs":["qio","80m"],
 			"bootloaders":[
@@ -175,6 +181,7 @@
 		},
 		{
 			"target": "esp32s2",
+			"skip": 1,
 			"features":["qio_ram"],
 			"idf_libs":["qio","80m"],
 			"bootloaders":[

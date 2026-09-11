@@ -167,6 +167,8 @@ if [ "$BUILD_TYPE" != "all" ]; then
         for defconf in `echo "$target_json" | jq -c '.features[]' | tr -d '"'`; do
             configs="$configs;configs/defconfig.$defconf"
         done
+        # BitBang overrides last, so they win over every fragment above.
+        configs="$configs;configs/defconfig.bitbang"
 
         echo "* Building for target: '$target', variant: '$CHIP_VARIANT'"
 
@@ -233,6 +235,8 @@ for target_json in `jq -c '.targets[]' configs/builds.json`; do
     for defconf in `echo "$target_json" | jq -c '.features[]' | tr -d '"'`; do
         main_configs="$main_configs;configs/defconfig.$defconf"
     done
+    # BitBang overrides last, so they win over every fragment above.
+    main_configs="$main_configs;configs/defconfig.bitbang"
 
     # Build IDF Libs
     idf_libs_configs="$main_configs"
