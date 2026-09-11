@@ -462,11 +462,30 @@ for item; do
 		if [[ "$fname" == "main" && "$dname" == $(basename "$PWD") ]]; then
 			continue
 		fi
+		# Walk up to the component root. Guard against paths that have no
+		# such root: dirname "/" is "/", so without this the loop spins
+		# forever forking dirname and basename, at a few percent CPU and no
+		# output, which reads as a very slow copy rather than a hang.
+		#
+		# Every in-tree component sits under components/ or
+		# managed_components/, so the invariant held until an out-of-tree
+		# component exposed include dirs from outside its own directory --
+		# app_webrtc publishes the KVS SDK's src/include and src/source/*.
+		# Those are private build-time includes; the component's public
+		# header is self-contained and everything behind it is already in
+		# the archive, so there is nothing for the package to ship and no
+		# sensible name to file it under.
 		while [[ "$dname" != "components" && "$dname" != "managed_components" && "$dname" != "build" ]]; do
+			if [[ "$ipath" == "/" || "$ipath" == "." ]]; then
+				break
+			fi
 			ipath=`dirname "$ipath"`
 			fname=`basename "$ipath"`
 			dname=`basename $(dirname "$ipath")`
 		done
+		if [[ "$dname" != "components" && "$dname" != "managed_components" && "$dname" != "build" ]]; then
+			continue
+		fi
 		if [[ "$fname" == "arduino" ]]; then
 			continue
 		fi
